@@ -6,8 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class Validator {
-
-	// Incluye aquí el resto de métodos de validación que necesites
 	
     public static boolean isValidDateTime(String dateTime) {
         try {
@@ -52,7 +50,7 @@ public class Validator {
         return numero >= min && numero <= max;
     }
     
-    public static boolean isValidNumberMin(double numero, double min) {
+    public static boolean isValidNumberMin(float numero, float min) {
         return numero >= min;
     }
     

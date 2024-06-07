@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Repository
 public class ViajesRepository {
@@ -46,9 +47,19 @@ public class ViajesRepository {
         return viajes;
     }
     
+    public Set<Viaje> findAll(String city) {
+		TreeSet<Viaje> viajesDePaso = new TreeSet<>();
+        for (Viaje viaje:findAll()) {
+            if(viaje.tieneEstaCiudadDestino(city)){
+                viajesDePaso.add(viaje);
+            }
+        }
+        return viajesDePaso;
+	}
+    
     /**
      * Obtiene el código del siguiente viaje
-     * @return
+     * @returnnull
      */
     public int getNextCodViaje() {
         return this.viajeDAO.findAll().size() + 1;

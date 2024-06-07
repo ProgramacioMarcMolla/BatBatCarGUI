@@ -22,6 +22,37 @@
 				background-color: green;
 				padding: 5px 0;
 			}
+			body {
+			            font-family: Arial, sans-serif;
+			            margin: 20px;
+			        }
+			        form {
+			            max-width: 500px;
+			            margin: 0 auto;
+			        }
+			        .form-group {
+			            margin-bottom: 15px;
+			        }
+			        .form-group label {
+			            display: block;
+			            margin-bottom: 5px;
+			        }
+			        .form-group input[type="text"] {
+			            width: 100%;
+			            padding: 8px;
+			            box-sizing: border-box;
+			        }
+			        .form-actions {
+			            text-align: center;
+			            margin-top: 20px;
+			        }
+			        .form-actions button {
+			            padding: 10px 20px;
+			            border: none;
+			            background-color: #007BFF;
+			            color: white;
+			            cursor: pointer;
+			        }
 </style>
 </head>
 <body>
@@ -32,6 +63,15 @@
 <div class="confirmacion" th:if="${confirmacion}">
 	<p th:text="${confirmacion}"></p>
 </div>
+<form action="/viajes" method="get">
+    <div class="form-group">
+        <label for="ciudad">Buscar:</label>
+        <input type="text" id="ciudad"	name="ciudad" placeholder="Escribe tu búsqueda aquí" required>
+    </div>
+    <div class="form-actions">
+        <button type="submit">Buscar</button>
+    </div>
+</form>
 <div class="section">
     <h3><strong>Listado de Viajes</strong></h3>
 </div>
@@ -43,6 +83,7 @@
         <th>Fecha y hora de salida</th>
         <th>Estado</th>
         <th>Reservas</th>
+		<th>Acciones</th>
     </tr>
     <tr th:each="viaje: ${viajes}">
         <td th:text="${viaje.getCodViaje()}"></td>
@@ -53,6 +94,11 @@
         <td>
             <span th:if="${viaje.seHanRealizadoReservas}">Sí</span>
 			<span th:unless="${viaje.seHanRealizadoReservas}">No</span>
+        </td>
+		<td>
+            <a th:href="@{/viaje/reserva/add(codViaje=${viaje.getCodViaje()})}" th:if="${viaje.estaDisponible()}">Reservar /</a>
+			<a th:href="@{/viaje(codViaje=${viaje.getCodViaje()})}">Ver detalle /</a>
+			<a th:href="@{/viaje/reservas(codViaje=${viaje.getCodViaje()})}">Ver reservas</a>
         </td>
     </tr>
 </table>

@@ -1,9 +1,14 @@
 package es.batbatcar.v2p4.controllers;
 
+import es.batbatcar.v2p4.exceptions.ViajeAlreadyExistsException;
+import es.batbatcar.v2p4.exceptions.ViajeNotFoundException;
+import es.batbatcar.v2p4.modelo.dto.viaje.Viaje;
 import es.batbatcar.v2p4.modelo.repositories.ViajesRepository;
 import es.batbatcar.v2p4.utils.Validator;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +33,13 @@ public class ViajesController {
      *
      * */
     @GetMapping("/viajes")
-    public String getViajesAction(Model model) {
-        model.addAttribute("viajes", viajesRepository.findAll());
+    public String getViajesAction(Model model, @RequestParam Map<String, String> params) {
+    	
+    	if(params.containsKey("ciudad")) {
+    		model.addAttribute("viajes", viajesRepository.findAll(params.get("ciudad")));
+    	}else {
+    		model.addAttribute("viajes", viajesRepository.findAll());
+    	}
         model.addAttribute("titulo", "Listado de viajes");
         return "viaje/listado";
     }
@@ -43,26 +53,37 @@ public class ViajesController {
     
     @PostMapping(value = "/viajes/add")
     public String postAddViajeAction(@RequestParam Map<String, String> params, RedirectAttributes redirectAttribuetes) {
-    	
+        List<String> errors = new ArrayList<>(); 
+        
+        String ruta ;
+    	int plazas ;
+    	String propietario;
+        float precio;
+        int duracion;
+        String diaSalida ;
+        
+        String horaSalida;
+        String minutoSalida ;
+        String salida ;
+
     	try {
-    		String ruta = params.get("ruta");
-        	int plazas = Integer.parseInt(params.get("plazas"));
-        	String propietario = params.get("propietario");
-            double precio = Double.parseDouble(params.get("precio"));
-            int duracion = Integer.parseInt(params.get("duracion"));
-            String diaSalida = params.get("dia_salida");
+    		 ruta = params.get("ruta");
+        	 plazas = Integer.parseInt(params.get("plazas"));
+        	 propietario = params.get("propietario");
+             precio = Float.parseFloat(params.get("precio"));
+             duracion = Integer.parseInt(params.get("duracion"));
+             diaSalida = params.get("dia_salida");
             
-            String horaSalida = params.get("hora_salida");
-            String minutoSalida = params.get("minuto_salida");
-            String salida = horaSalida + ":" + minutoSalida;
+             horaSalida = params.get("hora_salida");
+             minutoSalida = params.get("minuto_salida");
+             salida = horaSalida + ":" + minutoSalida;
             
-            List<String> errors = new ArrayList<>();    
          
             if(!Validator.isValidText(ruta, '-')) {
         		errors.add( "Ruta: La ruta No cumple con el formato establecido: ParadaIncial - Paradas - ParadaFinal");
         	}
             
-            if(!Validator.isValidNumberMin(plazas, 1)) {
+            if(!Validator.isValidNumberMinMax(plazas, 1,6)) {
             	errors.add("Plazas: Deben tener un valor positivo");
             }
             
@@ -89,37 +110,38 @@ public class ViajesController {
             }
             
 
-        	if (errors.size()>0) {
-            	redirectAttribuetes.addFlashAttribute("errors",errors);
-            	return "redirect:/viajes/add";
-            }
         	
-        	redirectAttribuetes.addFlashAttribute("confirmacion", "Viaje insertado con éxito.");
-        	return "redirect:/viajes";
             
     	}catch(NumberFormatException e) {
-            List<String> errors = new ArrayList<>();    	
+    		errors.clear();
             errors.add("Debes completar todos los campos");
     		
         	redirectAttribuetes.addFlashAttribute("errors",errors);
     		return "redirect:/viajes/add";
     	}
     	
+    	if (errors.size()>0) {
+        	redirectAttribuetes.addFlashAttribute("errors",errors);
+        	return "redirect:/viajes/add";
+        }
     	
     	
+    	LocalDateTime fechaConTiempo = LocalDateTime.of(LocalDate.parse(diaSalida), LocalTime.parse(horaSalida + ":" + minutoSalida));
     	
-        
-        
-        
-        
-        
-        
-        
+    	Viaje viaje = new Viaje(viajesRepository.getNextCodViaje(),propietario , ruta, fechaConTiempo, duracion, precio, plazas);
+    	try {
+			viajesRepository.save(viaje);
+		} catch (ViajeAlreadyExistsException e) {
+			e.printStackTrace();
+		} catch (ViajeNotFoundException e) {
+			e.printStackTrace();
+		}
+    	
+    	redirectAttribuetes.addFlashAttribute("confirmacion", "Viaje insertado con éxito.");
+    	return "redirect:/viajes";
     	
 
-    	
     }
-    
     
 
 }
