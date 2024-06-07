@@ -1,6 +1,7 @@
 package es.batbatcar.v2p4.utils;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -27,12 +28,35 @@ public class Validator {
 
     public static boolean isValidTime(String time) {
         try {
-            LocalDate.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
         } catch (DateTimeParseException e) {
             return false;
         }
         return true;
     }
+    
+    public static boolean isValidText(String ruta, char separador) {
+        if (ruta == null || ruta.trim().isEmpty()) {
+            return false;
+        }
+
+        String regex = "^[A-Z][a-z]+(\\s*\\" + separador + "\\s*[A-Z][a-z]+)*$";
+        return ruta.matches(regex);
+    }
+    
+    public static boolean isValidNumberMin(int numero, int min) {
+        return numero >= min;
+    }
+    
+    public static boolean isValidNumberMinMax(int numero, int min, int max) {
+        return numero >= min && numero <= max;
+    }
+    
+    public static boolean isValidNumberMin(double numero, double min) {
+        return numero >= min;
+    }
+    
+    
 
 }
 

@@ -7,11 +7,30 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/main.css">
     <title>Title</title>
+	<style>
+		.actions button {
+	            padding: 10px 20px;
+	            border: none;
+	            background-color: #007BFF;
+	            color: white;
+	            cursor: pointer;
+	        }
+	        .actions .cancel {
+	            background-color: #6c757d;
+	        }
+			.confirmacion {
+				background-color: green;
+				padding: 5px 0;
+			}
+</style>
 </head>
 <body>
 <div class="header">
     <img class="icon" src="/images/batbatcar.png">
     <p class="app-name">Aplicación Bat Bat Car v2</p>
+</div>
+<div class="confirmacion" th:if="${confirmacion}">
+	<p th:text="${confirmacion}"></p>
 </div>
 <div class="section">
     <h3><strong>Listado de Viajes</strong></h3>
@@ -37,5 +56,8 @@
         </td>
     </tr>
 </table>
+<div class="actions">
+    <button type="button" class="cancel" onclick="window.location.href='/viajes/add'">Añadir Viaje</button>
+</div>
 </body>
 </html>
