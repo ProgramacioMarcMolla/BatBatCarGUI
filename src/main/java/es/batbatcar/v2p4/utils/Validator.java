@@ -38,7 +38,7 @@ public class Validator {
             return false;
         }
 
-        String regex = "^[A-Z][a-z]+(\\s*\\" + separador + "\\s*[A-Z][a-z]+)*$";
+        String regex = "^[A-Z][a-z]+(" + separador +"[A-Z][a-z]+)*$";
         return ruta.matches(regex);
     }
     

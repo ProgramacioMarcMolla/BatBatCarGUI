@@ -1,1 +1,93 @@
-<!-- Vista para el detalle de un viaje -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Registro de Viaje</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        header {
+            margin-bottom: 20px;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-actions button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        .form-actions .cancel {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 th:text="|Detalle del Viaje con código ${viaje.getCodViaje()}|"></h1>
+    </header>		
+	<form action="/viajes/add" method="post">
+	    <div class="form-group">
+	        <label for="ruta">Ruta:</label>
+	        <input type="text" id="ruta" name="ruta" th:value="${viaje.getRuta()}" readonly>
+	    </div>
+	    <div class="form-group">
+	        <label for="plazas">Plazas ofertadas:</label>
+	        <input type="number" id="plazas" name="plazas" th:value="${viaje.getPlazasOfertadas()}" readonly>
+	    </div>
+	    <div class="form-group">
+	        <label for="propietario">Propietario:</label>
+	        <input type="text" id="propietario" name="propietario" th:value="${viaje.getPropietario()}" readonly>
+	    </div>
+	    <div class="form-group">
+	        <label for="precio">Precio (€):</label>
+	        <input type="number" step="0.01" id="precio" name="precio" th:value="${viaje.getPrecio()}" readonly>
+	    </div>
+	    <div class="form-group">
+	        <label for="duracion">Duración aprox. (min):</label>
+	        <input type="number" id="duracion" name="duracion" th:value="${viaje.getDuracion()}" readonly>
+	    </div>
+	    <div class="form-group">
+	        <label for="dia_salida">Día de salida:</label>
+	        <input type="date" id="dia_salida" name="dia_salida" th:value="${#temporals.format(viaje.getFechaSalida(), 'yyyy-MM-dd')}" readonly>
+	    </div>
+	    <div class="form-group">
+			<label for="diaSalida">Día de salida</label>
+			    <label for="horaSalida">Hora de salida</label>
+			    <input type="time" id="horaSalida" name="horaSalida" th:value="${#temporals.format(viaje.getFechaSalida(), 'HH:mm')}" readonly>
+	    </div>
+	    <div id="contenedorErrores" th:if="${errors}">
+	        <ul>
+	            <li th:each="error : ${errors}">
+	                <span th:text="${error}"></span>
+	            </li>
+	        </ul>
+	    </div>
+	    <div class="form-actions">
+	        <button type="button" class="cancel" onclick="window.location.href='/viajes'">Volver</button>
+	    </div>
+	</form>
+</body>
+</html>

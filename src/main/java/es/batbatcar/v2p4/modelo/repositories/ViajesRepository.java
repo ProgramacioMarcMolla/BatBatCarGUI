@@ -1,12 +1,15 @@
 package es.batbatcar.v2p4.modelo.repositories;
 
 import es.batbatcar.v2p4.exceptions.ReservaAlreadyExistsException;
+import es.batbatcar.v2p4.exceptions.ReservaNoValidaException;
 import es.batbatcar.v2p4.exceptions.ReservaNotFoundException;
 import es.batbatcar.v2p4.exceptions.ViajeAlreadyExistsException;
+import es.batbatcar.v2p4.exceptions.ViajeNoAbiertoException;
 import es.batbatcar.v2p4.exceptions.ViajeNotFoundException;
 import es.batbatcar.v2p4.modelo.dao.inmemorydao.InMemoryReservaDAO;
 import es.batbatcar.v2p4.modelo.dao.inmemorydao.InMemoryViajeDAO;
 import es.batbatcar.v2p4.modelo.dto.Reserva;
+import es.batbatcar.v2p4.modelo.dto.viaje.EstadoViaje;
 import es.batbatcar.v2p4.modelo.dto.viaje.Viaje;
 import es.batbatcar.v2p4.modelo.dao.interfaces.ReservaDAO;
 import es.batbatcar.v2p4.modelo.dao.interfaces.ViajeDAO;
@@ -79,6 +82,10 @@ public class ViajesRepository {
     		viajeDAO.update(viaje);
     	}
     }
+    
+    public void update(Viaje viaje) throws ViajeNotFoundException {
+    	viajeDAO.update(viaje);
+    }
 	
     /**
      * Encuentra todas las reservas de @viaje
@@ -105,6 +112,7 @@ public class ViajesRepository {
     }
     
     /**
+     * 
      * Elimina la reserva
      * @param reserva
      * @throws ReservaNotFoundException
@@ -112,4 +120,78 @@ public class ViajesRepository {
 	public void remove(Reserva reserva) throws ReservaNotFoundException {
 		reservaDAO.remove(reserva);
 	}
+	
+	public Viaje findViajeById(int cod) {
+		return viajeDAO.findById(cod);
+	}
+
+	public Viaje findViajeSiPermiteReserva(int codViaje, String usuario, String plazas) throws ViajeNoAbiertoException, ReservaNoValidaException, ViajeNotFoundException {
+		Viaje viaje = findViajeById(codViaje);
+		
+		 if (viaje == null) {
+		        throw new ViajeNotFoundException("El viaje no está disponible");
+		    }
+		
+		List<Reserva> reservas = reservaDAO.findAllByTravel(viaje);
+    	int plazasReservadas = 0;
+    	
+    	if(reservas != null && !reservas.isEmpty()) {
+    		for(Reserva reserva: reservas) {
+        		if (reserva.getUsuario().equals(usuario)) {
+        			throw new ReservaNoValidaException("Ya has realizado una reserva");
+        		}
+        		
+        		plazasReservadas += reserva.getPlazasSolicitadas();
+        	}
+    	}
+    	
+    	
+		
+		if(!viaje.getEstado().equals(EstadoViaje.ABIERTO)) {
+			throw new ViajeNoAbiertoException(codViaje);
+		}
+		
+		if (plazas == null || plazas.isEmpty()) {
+	        throw new ReservaNoValidaException("El número de plazas no puede ser nulo o vacío");
+	    } 
+				
+		if((Integer.parseInt(plazas) + plazasReservadas ) > viaje.getPlazasOfertadas()) {
+			throw new ReservaNoValidaException("No quedan suficientes plazas, plazas disponibles = " + (viaje.getPlazasOfertadas()-plazasReservadas));
+		}
+		
+		if (viaje.getPropietario().equals(usuario)) {
+    		throw new ReservaNoValidaException("El propietario no puede realizar reservas");
+    	}
+		
+		
+		return viaje;
+	}
+	
+	public int getPlazasOcupadas(Viaje viaje) {
+		List<Reserva> reservas = reservaDAO.findAllByTravel(viaje);
+		int plazasReservadas = 0;
+		for(Reserva reserva: reservas) {
+    		plazasReservadas += reserva.getPlazasSolicitadas();
+    	}
+		return plazasReservadas;
+	}
+	
+	public String getNewCodReserva(Viaje viaje) {
+		List<Reserva> reservas = reservaDAO.findAllByTravel(viaje);
+		if (reservas.isEmpty()) {
+			return viaje.getCodViaje() + "-1";
+		}
+		
+    	String codigoUltimaReserva = reservas.get(reservas.size() - 1).getCodigoReserva();
+    	int numReserva = Integer.parseInt(codigoUltimaReserva.substring(codigoUltimaReserva.indexOf('-'))+1);
+    	
+    	String codigoNuevaReserva = String.valueOf(viaje.getCodViaje()) + numReserva ;
+
+		return codigoNuevaReserva;
+		
+	}
+	
+	
+	
+	
 }

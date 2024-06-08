@@ -1,1 +1,62 @@
-<!-- Vista para el listado de reservas de un viaje -->
+<!-- Vista principal: Listado de viajes -->
+
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/main.css">
+    <title>Title</title>
+	<style>
+		.actions button {
+	            padding: 10px 20px;
+	            border: none;
+	            background-color: #007BFF;
+	            color: white;
+	            cursor: pointer;
+	        }
+	        .actions .cancel {
+	            background-color: #6c757d;
+	        }
+			.confirmacion {
+				background-color: green;
+				padding: 5px 0;
+			}
+			body {
+			            font-family: Arial, sans-serif;
+			            margin: 20px;
+			        }
+			        
+</style>
+</head>
+<body>
+<div class="header">
+    <img class="icon" src="/images/batbatcar.png">
+    <p class="app-name">Aplicación Bat Bat Car v2</p>
+</div>
+<div class="confirmacion" th:if="${confirmacion}">
+	<p th:text="${confirmacion}"></p>
+</div>
+
+<div class="section">
+    <h3><strong>Listado de Viajes</strong></h3>
+</div>
+<table class="reservas">
+    <tr>
+        <th>Código de Reserva</th>
+        <th>Usuario</th>
+        <th>Plazas Solicitadas</th>
+        <th>Fecha y Hora de Salida del Viaje</th>
+    </tr>
+    <tr th:each="reserva: ${reservas}">
+        <td th:text="${reserva.getCodigoReserva()}"></td>
+        <td th:text="${reserva.getUsuario()}"></td>
+        <td th:text="${reserva.getPlazasSolicitadas()}"></td>
+        <td th:text="${#temporals.format(viaje.getFechaSalida(), 'dd-MM-yyyy ''a las'' HH:mm')}"></td>
+    </tr>
+</table>
+<div class="actions">
+    <button type="button" class="cancel" onclick="window.location.href='/viajes'">Volver</button>
+</div>
+</body>
+</html>

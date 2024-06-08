@@ -74,17 +74,27 @@ public class ViajesController {
              duracion = Integer.parseInt(params.get("duracion"));
              diaSalida = params.get("dia_salida");
             
-             horaSalida = params.get("hora_salida");
-             minutoSalida = params.get("minuto_salida");
+             if(params.get("hora_salida").length() == 1) {
+            	 horaSalida = "0" + params.get("hora_salida");
+             }else {
+                 horaSalida = params.get("hora_salida");
+             }
+             
+             if( params.get("minuto_salida").length() == 1) {
+            	 minutoSalida = "0" +  params.get("minuto_salida");
+             }else {
+            	 minutoSalida = params.get("minuto_salida");
+             }
+             
              salida = horaSalida + ":" + minutoSalida;
             
          
             if(!Validator.isValidText(ruta, '-')) {
-        		errors.add( "Ruta: La ruta No cumple con el formato establecido: ParadaIncial - Paradas - ParadaFinal");
+        		errors.add( "Ruta: La ruta No cumple con el formato establecido: ParadaIncial-Paradas-ParadaFinal");
         	}
             
             if(!Validator.isValidNumberMinMax(plazas, 1,6)) {
-            	errors.add("Plazas: Deben tener un valor positivo");
+            	errors.add("Plazas: Deben tener un valor entre 1 y 6");
             }
             
             if(!Validator.isValidText(propietario,' ')) {
@@ -120,10 +130,7 @@ public class ViajesController {
     		return "redirect:/viajes/add";
     	}
     	
-    	if (errors.size()>0) {
-        	redirectAttribuetes.addFlashAttribute("errors",errors);
-        	return "redirect:/viajes/add";
-        }
+    	 
     	
     	
     	LocalDateTime fechaConTiempo = LocalDateTime.of(LocalDate.parse(diaSalida), LocalTime.parse(horaSalida + ":" + minutoSalida));
@@ -139,9 +146,22 @@ public class ViajesController {
     	
     	redirectAttribuetes.addFlashAttribute("confirmacion", "Viaje insertado con éxito.");
     	return "redirect:/viajes";
-    	
-
     }
+    
+    @GetMapping("/viaje")
+    public String getDetailAction(@RequestParam Map<String, String> params, Model model) {
+    	if (!params.containsKey("codViaje") || params.get("codViaje").isEmpty()) {
+    		return "redirect:/viajes";
+    	}
+    	
+    	int codViaje = Integer.parseInt(params.get("codViaje"));
+    	model.addAttribute("viaje", viajesRepository.findViajeById(codViaje));
+    	return "viaje/viaje_detalle";
+    }
+    
+
+    
+ 
     
 
 }
