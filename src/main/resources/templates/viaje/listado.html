@@ -22,6 +22,10 @@
 				background-color: green;
 				padding: 5px 0;
 			}
+			.negacion {
+							background-color: red;
+							padding: 5px 0;
+						}
 			body {
 			            font-family: Arial, sans-serif;
 			            margin: 20px;
@@ -63,6 +67,9 @@
 <div class="confirmacion" th:if="${confirmacion}">
 	<p th:text="${confirmacion}"></p>
 </div>
+<div class="negacion" th:if="${negacion}">
+	<p th:text="${negacion}"></p>
+</div>
 <form action="/viajes" method="get">
     <div class="form-group">
         <label for="ciudad">Buscar:</label>
@@ -73,7 +80,7 @@
     </div>
 </form>
 <div class="section">
-    <h3><strong>Listado de Viajes</strong></h3>
+    <h3><strong th:text="${titulo}"></strong></h3>
 </div>
 <table class="viajes">
     <tr>
@@ -82,7 +89,8 @@
         <th>Propietario</th>
         <th>Fecha y hora de salida</th>
         <th>Estado</th>
-        <th>Reservas</th>
+        <th>Num Reservas</th>
+		<th>Plazas Disponibles</th>
 		<th>Acciones</th>
     </tr>
     <tr th:each="viaje: ${viajes}">
@@ -91,14 +99,13 @@
         <td th:text="${viaje.getPropietario()}"></td>
         <td th:text="${#temporals.format(viaje.getFechaSalida(), 'dd-MM-yyyy ''a las'' HH:mm')}"></td>
         <td th:classappend="${(viaje.estaDisponible()) ? 'abierto':'cerrado'}" th:text="${viaje.getEstado()}"></td>
-        <td>
-            <span th:if="${viaje.seHanRealizadoReservas}">Sí</span>
-			<span th:unless="${viaje.seHanRealizadoReservas}">No</span>
-        </td>
+		<td th:text="${viajesRepository.getNumReservas(viaje)}"></td>
+		<td th:text="${viaje.getPlazasOfertadas()-viajesRepository.getPlazasOcupadas(viaje)}" ></td>
 		<td>
             <a th:href="@{/viaje/reserva/add(codViaje=${viaje.getCodViaje()})}" th:if="${viaje.estaDisponible()}">Reservar /</a>
 			<a th:href="@{/viaje(codViaje=${viaje.getCodViaje()})}">Ver detalle /</a>
-			<a th:href="@{/viaje/reservas(codViaje=${viaje.getCodViaje()})}">Ver reservas</a>
+			<a th:href="@{/viaje/reservas(codViaje=${viaje.getCodViaje()})}">Ver reservas /</a>
+			<a th:href="@{/viaje/cancelar(codViaje=${viaje.getCodViaje()})}" th:if="${viaje.estaDisponible()}">Cancelar</a>
         </td>
     </tr>
 </table>

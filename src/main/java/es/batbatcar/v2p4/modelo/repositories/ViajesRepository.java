@@ -13,6 +13,8 @@ import es.batbatcar.v2p4.modelo.dto.viaje.EstadoViaje;
 import es.batbatcar.v2p4.modelo.dto.viaje.Viaje;
 import es.batbatcar.v2p4.modelo.dao.interfaces.ReservaDAO;
 import es.batbatcar.v2p4.modelo.dao.interfaces.ViajeDAO;
+import es.batbatcar.v2p4.modelo.dao.sqldao.SQLReservaDAO;
+import es.batbatcar.v2p4.modelo.dao.sqldao.SQLViajeDAO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -27,7 +29,7 @@ public class ViajesRepository {
     private final ViajeDAO viajeDAO;
     private final ReservaDAO reservaDAO;
 
-    public ViajesRepository(@Autowired InMemoryViajeDAO viajeDAO, @Autowired InMemoryReservaDAO reservaDAO) {
+    public ViajesRepository(@Autowired SQLViajeDAO viajeDAO, @Autowired SQLReservaDAO reservaDAO) {
         this.viajeDAO = viajeDAO;
         this.reservaDAO = reservaDAO;
     }
@@ -176,20 +178,35 @@ public class ViajesRepository {
 		return plazasReservadas;
 	}
 	
-	public String getNewCodReserva(Viaje viaje) {
+	public int getNumReservas(Viaje viaje) {
 		List<Reserva> reservas = reservaDAO.findAllByTravel(viaje);
-		if (reservas.isEmpty()) {
-			return viaje.getCodViaje() + "-1";
-		}
-		
-    	String codigoUltimaReserva = reservas.get(reservas.size() - 1).getCodigoReserva();
-    	int numReserva = Integer.parseInt(codigoUltimaReserva.substring(codigoUltimaReserva.indexOf('-'))+1);
-    	
-    	String codigoNuevaReserva = String.valueOf(viaje.getCodViaje()) + numReserva ;
+		int numReservas = 0;
+		for(Reserva reserva: reservas) {
+			numReservas++;
+			}
+		return numReservas;
+	}
+	
+	public String getNewCodReserva(Viaje viaje) {
+	    List<Reserva> reservas = reservaDAO.findAllByTravel(viaje);
+	    if (reservas.isEmpty()) {
+	        return viaje.getCodViaje() + "-1";
+	    }
+	    
+	    String codigoUltimaReserva = reservas.get(reservas.size() - 1).getCodigoReserva();
+	    int numReserva = Integer.parseInt(codigoUltimaReserva.substring(codigoUltimaReserva.indexOf('-') + 1));
+	    
+	    String codigoNuevaReserva = viaje.getCodViaje() + "-" + (numReserva + 1);
 
-		return codigoNuevaReserva;
+	    return codigoNuevaReserva;
+	}
+
+	public Reserva findReservaById(String codReserva) {
+		
+		return reservaDAO.findById(codReserva);
 		
 	}
+
 	
 	
 	

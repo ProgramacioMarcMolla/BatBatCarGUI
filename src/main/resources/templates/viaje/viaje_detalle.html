@@ -13,7 +13,7 @@
             margin-bottom: 20px;
         }
         form {
-            max-width: 500px;
+            max-width: 800px;
             margin: 0 auto;
         }
         .form-group {
@@ -42,6 +42,32 @@
         .form-actions .cancel {
             background-color: #6c757d;
         }
+		.form-actions .cancelViaje{
+			background-color: lightcoral;
+		}
+		table {
+		    text-align: center;
+		    padding: 10px;
+		    border: 1px solid black;
+		    width: 90%;
+		    margin: 10px auto;
+		}
+		
+		table a {
+		    font-size: 12px;
+		}
+		table tr td {
+		    padding: 5px;
+		}
+		
+		table tr th {
+		    border-bottom: 1px solid black;
+		    margin-bottom: 2px;
+		}
+		
+		table.viajes tr:nth-child(2n) {
+		    background-color: lightgrey;
+		}
     </style>
 </head>
 <body>
@@ -85,8 +111,29 @@
 	            </li>
 	        </ul>
 	    </div>
+		<table class="reservas">
+		    <tr>
+		        <th>Código de Reserva</th>
+		        <th>Usuario</th>
+		        <th>Plazas Solicitadas</th>
+		        <th>Fecha y Hora de Salida del Viaje</th>
+				<th>Acciones</th>
+		    </tr>
+		    <tr th:each="reserva: ${reservas}">
+		        <td th:text="${reserva.getCodigoReserva()}"></td>
+		        <td th:text="${reserva.getUsuario()}"></td>
+		        <td th:text="${reserva.getPlazasSolicitadas()}"></td>
+		        <td th:text="${#temporals.format(viaje.getFechaSalida(), 'dd-MM-yyyy ''a las'' HH:mm')}"></td>
+				<td>
+					<a th:href="@{/viaje/reserva(codigoReserva=${reserva.getCodigoReserva()})}">Ver Detalle /</a>
+					<a th:href="@{/viaje/reserva/cancelar(codigoReserva=${reserva.getCodigoReserva()})}">Cancelar</a>
+				</td>
+		    </tr>
+		</table>
 	    <div class="form-actions">
 	        <button type="button" class="cancel" onclick="window.location.href='/viajes'">Volver</button>
+			<button type="button" class="cancelViaje" th:onclick="|window.location.href='@{/viaje/cancelar(codViaje=${viaje.getCodViaje()})}'|" >Cancelar Viaje</button>
+			<button type="button" th:onclick="|window.location.href='@{/viaje/reserva/add(codViaje=${viaje.getCodViaje()})}'|" 	th:if="${viaje.estaDisponible()}">Reservar</button>
 	    </div>
 	</form>
 </body>

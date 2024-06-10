@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Reserva</title>
+    <style>
+		.actions button {
+			            padding: 10px 20px;
+			            border: none;
+			            background-color: #007BFF;
+			            color: white;
+			            cursor: pointer;
+			        }
+			        .actions .cancel {
+			            background-color: #6c757d;
+			        }
+					.confirmacion {
+						background-color: green;
+						padding: 5px 0;
+					}
+					body {
+					            font-family: Arial, sans-serif;
+					            margin: 20px;
+					        }
+					        form {
+					            max-width: 1000px;
+					            margin: 0 auto;
+					        }
+					        .form-group {
+					            margin-bottom: 15px;
+					        }
+					        .form-group label {
+					            display: block;
+					            margin-bottom: 5px;
+					        }
+					        .form-group input[type="text"] {
+					            width: 100%;
+					            padding: 8px;
+					            box-sizing: border-box;
+					        }
+					        .form-actions {
+					            text-align: center;
+					            margin-top: 20px;
+					        }
+					        .form-actions button {
+					            padding: 10px 20px;
+					            border: none;
+					            background-color: #007BFF;
+					            color: white;
+					            cursor: pointer;
+					        }
+							.form-actions .cancel{
+								background-color: #6c757d;
+							}
+							table {
+							    text-align: center;
+							    padding: 10px;
+							    border: 1px solid black;
+							    width: 90%;
+							    margin: 10px auto;
+							}
+							
+							table a {
+							    font-size: 12px;
+							}
+							table tr td {
+							    padding: 5px;
+							}
+							
+							table tr th {
+							    border-bottom: 1px solid black;
+							    margin-bottom: 2px;
+							}
+							
+							table.viajes tr:nth-child(2n) {
+							    background-color: lightgrey;
+							}
+    </style>
+</head>
+<body>
+    <h1 	th:text="|	Detalles de Reserva del Viaje 	${viaje.getCodViaje()}|"></h1>
+    <form 	th:action="@{/viaje/reserva/add(codViaje=${codViaje})}" method="post">
+        <div class="form-group">
+            <label for="usuario">Nombre del usuario:</label>
+            <input type="text" id="usuario" name="usuario"	th:value="${reserva.getUsuario()}" readonly >
+        </div>
+        <div class="form-group">
+            <label for="plazas">Número de plazas a reservar:</label>
+            <input type="number" id="plazas" name="plazas" th:value="${reserva.getPlazasSolicitadas()}" readonly >
+        </div>
+        <div id="contenedorErrores" th:if="${errors}">
+            <ul>
+                <li th:each="error : ${errors}">
+                    <span th:text="${error}"></span>
+                </li>
+            </ul>
+        </div>
+		<h1 th:text="|	Detalles del Viaje ${viaje.getCodViaje()}|"></h1>
+		<table class="viaje">
+		    <tr>
+		        <th>Cod. Viaje</th>
+		        <th>Ruta</th>
+		        <th>Propietario</th>
+		        <th>Fecha y hora de salida</th>
+		        <th>Estado</th>
+				<th>Acciones</th>
+		    </tr>
+		    <tr>
+		        <td th:text="${viaje.getCodViaje()}"></td>
+		        <td th:text="${viaje.getRuta()}"></td>
+		        <td th:text="${viaje.getPropietario()}"></td>
+		        <td th:text="${#temporals.format(viaje.getFechaSalida(), 'dd-MM-yyyy ''a las'' HH:mm')}"></td>
+		        <td th:classappend="${(viaje.estaDisponible()) ? 'abierto':'cerrado'}" th:text="${viaje.getEstado()}"></td>
+
+				<td>
+		            <a th:href="@{/viaje/reserva/add(codViaje=${viaje.getCodViaje()})}" th:if="${viaje.estaDisponible()}">Reservar /</a>
+					<a th:href="@{/viaje(codViaje=${viaje.getCodViaje()})}">Ver detalle /</a>
+					<a th:href="@{/viaje/reservas(codViaje=${viaje.getCodViaje()})}">Ver reservas</a>
+		        </td>
+		    </tr>
+		</table>
+        <div class="form-actions">
+            <button type="button" class="cancel" th:onclick="|window.location.href='@{/viaje/reservas(codViaje=${viaje.getCodViaje()})}'|">Volver</button>
+        </div>
+    </form>
+</body>
+</html>

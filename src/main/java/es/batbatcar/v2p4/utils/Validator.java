@@ -17,7 +17,13 @@ public class Validator {
     }
     public static boolean isValidDate(String date) {
         try {
-            LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            System.out.println("try");
+            LocalDate fecha = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            System.out.println("try");
+            if(fecha.isBefore(LocalDate.now())) {
+                System.out.println("if");
+            	return false;
+            }
         } catch (DateTimeParseException e) {
             return false;
         }

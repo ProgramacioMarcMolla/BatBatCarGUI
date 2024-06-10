@@ -1,6 +1,7 @@
 package es.batbatcar.v2p4.controllers;
 
 import es.batbatcar.v2p4.exceptions.ViajeAlreadyExistsException;
+import es.batbatcar.v2p4.exceptions.ViajeNotCancelableException;
 import es.batbatcar.v2p4.exceptions.ViajeNotFoundException;
 import es.batbatcar.v2p4.modelo.dto.viaje.Viaje;
 import es.batbatcar.v2p4.modelo.repositories.ViajesRepository;
@@ -41,6 +42,7 @@ public class ViajesController {
     		model.addAttribute("viajes", viajesRepository.findAll());
     	}
         model.addAttribute("titulo", "Listado de viajes");
+        model.addAttribute("viajesRepository",viajesRepository);
         return "viaje/listado";
     }
     
@@ -130,7 +132,10 @@ public class ViajesController {
     		return "redirect:/viajes/add";
     	}
     	
-    	 
+    	if(errors.size() > 0) {
+    		redirectAttribuetes.addFlashAttribute("errors",errors);
+    		return "redirect:/viajes/add";
+    	}
     	
     	
     	LocalDateTime fechaConTiempo = LocalDateTime.of(LocalDate.parse(diaSalida), LocalTime.parse(horaSalida + ":" + minutoSalida));
@@ -149,14 +154,39 @@ public class ViajesController {
     }
     
     @GetMapping("/viaje")
-    public String getDetailAction(@RequestParam Map<String, String> params, Model model) {
+    public String getDetailAction(@RequestParam Map<String, String> params, Model model, RedirectAttributes redirectAttributes) {
     	if (!params.containsKey("codViaje") || params.get("codViaje").isEmpty()) {
+    		redirectAttributes.addFlashAttribute("negacion", "Código inválido");
     		return "redirect:/viajes";
     	}
     	
     	int codViaje = Integer.parseInt(params.get("codViaje"));
     	model.addAttribute("viaje", viajesRepository.findViajeById(codViaje));
+    	model.addAttribute("reservas", viajesRepository.findReservasByViaje(viajesRepository.findViajeById(codViaje)));
     	return "viaje/viaje_detalle";
+    }
+    
+    @GetMapping("/viaje/cancelar")
+    public String getCancelViajeAction(@RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
+    	if (!params.containsKey("codViaje") || params.get("codViaje").isEmpty()) {
+    		redirectAttributes.addFlashAttribute("negacion", "Código inválido");
+    		return "redirect:/viajes";
+    	}
+    	int codViaje = Integer.parseInt( params.get("codViaje"));
+    	
+    	Viaje viaje = viajesRepository.findViajeById(codViaje);
+    	
+    	try {
+			viaje.cancelarViaje();
+			viajesRepository.update(viaje);
+		} catch (ViajeNotFoundException e) {
+			redirectAttributes.addFlashAttribute("negacion", "Viaje no encontrado");
+    		return "redirect:/viajes";
+		}
+    	
+    	
+    	redirectAttributes.addFlashAttribute("confirmacion", "Viaje  cancelado con éxito");
+		return "redirect:/viajes";
     }
     
 

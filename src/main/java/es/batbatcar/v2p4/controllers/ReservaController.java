@@ -9,6 +9,7 @@ import es.batbatcar.v2p4.exceptions.ViajeNotFoundException;
 import es.batbatcar.v2p4.modelo.dto.Reserva;
 import es.batbatcar.v2p4.modelo.dto.viaje.Viaje;
 import es.batbatcar.v2p4.modelo.repositories.ViajesRepository;
+import es.batbatcar.v2p4.utils.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,14 @@ public class ReservaController {
     	try {
     		usuario = params.get("usuario");
     		plazas = params.get("plazas");
+    		
+    		if(!Validator.isValidText(usuario, ' ')) {
+    			errors.add( "Usuario: El propietario debe tener un formato tal que: Nombre Apellido");
+    		}
+    		
+    		if(!Validator.isValidNumberMinMax(Integer.parseInt(plazas),1, 6)) {
+    			errors.add( "Plazas: Debe ser un valor entre 1 y 6");
+    		}
     		
     		viaje = viajesRepository.findViajeSiPermiteReserva(codViaje, usuario, plazas);
     			
@@ -111,7 +120,48 @@ public class ReservaController {
     	model.addAttribute("reservas",reservas);
     	return "reserva/listado";
     	
+    	
+    	
+    }
+    
+    
+    @GetMapping("/viaje/reserva/cancelar")
+    public String getCancelReservaAction( @RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
+    	String codigoReserva = params.get("codigoReserva");
+    	int codViaje = viajesRepository.findReservaById(codigoReserva).getCodigoViaje();
+    	try {
+			viajesRepository.remove(viajesRepository.findReservaById(codigoReserva));
+			Viaje viaje = viajesRepository.findViajeById(codViaje);
+			viaje.abrir();
+			viajesRepository.update(viaje);
+			redirectAttributes.addFlashAttribute("confirmacion", "Reserva cancelada con éxito");
+		} catch (ReservaNotFoundException e) {
+			redirectAttributes.addFlashAttribute("e", e.getMessage());
+		} catch (ViajeNotFoundException e) {
+			redirectAttributes.addFlashAttribute("e", e.getMessage());
+		}
+    	redirectAttributes.addAttribute("codViaje", codViaje);
+    	return "redirect:/viaje/reservas";
+    }
+    
+    @GetMapping("/viaje/reserva")
+    public String getDetailReservaAction(@RequestParam Map<String, String> params, Model model){
+    	if (!params.containsKey("codigoReserva") || params.get("codigoReserva").isEmpty()) {
+    		return "redirect:/viajes";
+    	}
+    	
+    	Reserva reserva = viajesRepository.findReservaById(params.get("codigoReserva"));
+    	Viaje viaje = viajesRepository.findViajeById(reserva.getCodigoViaje());
+    	model.addAttribute("reserva", reserva);
+    	model.addAttribute("viaje",viaje);
+    	return "/reserva/reserva_detalle";
     }
     
     
 }
+    
+    
+    
+    
+    
+

@@ -158,6 +158,14 @@ public class Viaje implements Comparable<Viaje> {
         }
         this.estadoViaje = EstadoViaje.CANCELADO;
     }
+    
+    public void cancelarViaje() {
+    	this.estadoViaje = EstadoViaje.CANCELADO;
+    }
+    
+    public void abrir() {
+    	this.estadoViaje = EstadoViaje.ABIERTO;
+    }
 
     public boolean tieneEsteEstado(EstadoViaje estadoViaje) {
         return this.estadoViaje == estadoViaje;

@@ -26,6 +26,30 @@
 			            font-family: Arial, sans-serif;
 			            margin: 20px;
 			        }
+					
+					table {
+					    text-align: center;
+					    padding: 10px;
+					    border: 1px solid black;
+					    width: 90%;
+					    margin: 10px auto;
+					}
+					
+					table a {
+					    font-size: 12px;
+					}
+					table tr td {
+					    padding: 5px;
+					}
+					
+					table tr th {
+					    border-bottom: 1px solid black;
+					    margin-bottom: 2px;
+					}
+					
+					table.viajes tr:nth-child(2n) {
+					    background-color: lightgrey;
+					}
 			        
 </style>
 </head>
@@ -47,12 +71,17 @@
         <th>Usuario</th>
         <th>Plazas Solicitadas</th>
         <th>Fecha y Hora de Salida del Viaje</th>
+		<th>Acciones</th>
     </tr>
     <tr th:each="reserva: ${reservas}">
         <td th:text="${reserva.getCodigoReserva()}"></td>
         <td th:text="${reserva.getUsuario()}"></td>
         <td th:text="${reserva.getPlazasSolicitadas()}"></td>
         <td th:text="${#temporals.format(viaje.getFechaSalida(), 'dd-MM-yyyy ''a las'' HH:mm')}"></td>
+		<td>
+			<a th:href="@{/viaje/reserva(codigoReserva=${reserva.getCodigoReserva()})}">Ver Detalle /</a>
+			<a th:href="@{/viaje/reserva/cancelar(codigoReserva=${reserva.getCodigoReserva()})}">Cancelar</a>
+		</td>
     </tr>
 </table>
 <div class="actions">
