@@ -7,6 +7,7 @@ import es.batbatcar.v2p4.exceptions.ViajeAlreadyExistsException;
 import es.batbatcar.v2p4.exceptions.ViajeNoAbiertoException;
 import es.batbatcar.v2p4.exceptions.ViajeNotFoundException;
 import es.batbatcar.v2p4.modelo.dto.Reserva;
+import es.batbatcar.v2p4.modelo.dto.viaje.EstadoViaje;
 import es.batbatcar.v2p4.modelo.dto.viaje.Viaje;
 import es.batbatcar.v2p4.modelo.repositories.ViajesRepository;
 import es.batbatcar.v2p4.utils.Validator;
@@ -132,7 +133,9 @@ public class ReservaController {
     	try {
 			viajesRepository.remove(viajesRepository.findReservaById(codigoReserva));
 			Viaje viaje = viajesRepository.findViajeById(codViaje);
-			viaje.abrir();
+			if(!viaje.haSalido() && viaje.getEstado().equals(EstadoViaje.CERRADO)) {
+				viaje.abrir();
+			}
 			viajesRepository.update(viaje);
 			redirectAttributes.addFlashAttribute("confirmacion", "Reserva cancelada con éxito");
 		} catch (ReservaNotFoundException e) {

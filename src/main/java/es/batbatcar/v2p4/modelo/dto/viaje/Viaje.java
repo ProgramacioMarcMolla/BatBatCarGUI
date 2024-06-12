@@ -144,7 +144,7 @@ public class Viaje implements Comparable<Viaje> {
         return this.estadoViaje == EstadoViaje.ABIERTO && !haSalido();
     }
 
-    protected boolean haSalido() {
+    public boolean haSalido() {
         return fechaSalida.isBefore(LocalDateTime.now());
     }
 

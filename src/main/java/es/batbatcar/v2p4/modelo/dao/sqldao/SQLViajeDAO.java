@@ -117,7 +117,7 @@ public class SQLViajeDAO implements ViajeDAO {
     public Viaje findById(int codViaje) {
     	Connection connection = mariaDBConnection.getConnection();
     	
-    	String sql = "SELECT * FROM " + TABLE_NAME + " WHERE codViaje=" + codViaje;
+    	String sql = "SELECT * FROM " + TABLE_NAME + " WHERE cod_viaje=" + codViaje;
     	
     	try (
     			Statement statement = connection.createStatement();
@@ -149,7 +149,7 @@ public class SQLViajeDAO implements ViajeDAO {
     	
     	String sql = String.format(
     			Locale.US,
-    			"INSERT INTO %s (propietario, ruta, fechaSalida, duracion, precio, plazasOfertadas, estadoViaje)"
+    			"INSERT INTO %s (propietario, ruta, fecha_salida, duracion, precio, plazas_ofertadas, estado_viaje)"
     			+ " VALUES ( '%s', '%s', '%s', %d, %.2f, %d, '%s')",
     			TABLE_NAME,
     			viaje.getPropietario(),
@@ -180,8 +180,8 @@ public class SQLViajeDAO implements ViajeDAO {
     	
     	String sql = String.format(
     			Locale.US,
-    			"UPDATE %s SET propietario='%s', ruta='%s', fechaSalida='%s', duracion=%d, precio=%.2f, plazasOfertadas=%d, estadoViaje='%s'"
-    			+ " WHERE codViaje=%d",
+    			"UPDATE %s SET propietario='%s', ruta='%s', fecha_salida='%s', duracion=%d, precio=%.2f, plazas_ofertadas=%d, estado_viaje='%s'"
+    			+ " WHERE cod_viaje=%d",
     			TABLE_NAME,
     			viaje.getPropietario(),
     			viaje.getRuta(),
@@ -208,7 +208,7 @@ public class SQLViajeDAO implements ViajeDAO {
     public void remove(Viaje viaje) throws ViajeNotFoundException {
     	Connection connection = mariaDBConnection.getConnection();
     	
-    	String sql = "DELETE FROM " + TABLE_NAME + " WHERE codViaje=" + viaje.getCodViaje();
+    	String sql = "DELETE FROM " + TABLE_NAME + " WHERE cod_viaje=" + viaje.getCodViaje();
     	
     	try (Statement statement = connection.createStatement())
     	{
@@ -222,14 +222,14 @@ public class SQLViajeDAO implements ViajeDAO {
     }
     
     private Viaje mapToViaje(ResultSet rs) throws SQLException {
-    	int codViaje = rs.getInt("codViaje");
+    	int codViaje = rs.getInt("cod_viaje");
 	    String propietario = rs.getString("propietario");
 	    String ruta = rs.getString("ruta");
-	    LocalDateTime fechaSalida = rs.getTimestamp("fechaSalida").toLocalDateTime();
+	    LocalDateTime fechaSalida = rs.getTimestamp("fecha_salida").toLocalDateTime();
 	    long duracion = rs.getInt("duracion");
 	    float precio = rs.getFloat("precio");
-	    int plazasOfertadas = rs.getInt("plazasOfertadas");
-	    EstadoViaje estadoViaje = EstadoViaje.parse(rs.getString("estadoViaje"));
+	    int plazasOfertadas = rs.getInt("plazas_ofertadas");
+	    EstadoViaje estadoViaje = EstadoViaje.parse(rs.getString("estado_viaje"));
 	    
 	    return new Viaje(codViaje, propietario, ruta, fechaSalida, duracion, precio, plazasOfertadas, estadoViaje);
     }
